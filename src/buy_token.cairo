@@ -8,8 +8,6 @@ trait IToken<TContractState> {
     fn allowance(self: @TContractState, from: ContractAddress, to: ContractAddress ) -> u128;
     fn transfer_from(ref self: TContractState, from: ContractAddress, to: ContractAddress, amount: u128 );
     fn withdrawTokens(ref self: TContractState, contract_address: ContractAddress, amount: u128);
-    fn withdrawAllTokens(ref self: TContractState, contract_address: ContractAddress);
-    fn withdrawEth(ref self: TContractState);
     fn get_name(self: @TContractState) -> felt252;
     fn get_symbol(self: @TContractState) -> felt252;
     fn get_decimal(self: @TContractState) -> u128;
@@ -21,7 +19,7 @@ trait IToken<TContractState> {
 #[starknet::contract]
 
 mod BuyToken {
-use starknet::{ContractAddress, get_caller_address};
+use starknet::{ContractAddress, get_caller_address, get_contract_address};
 
     #[storage]
     struct Storage {
@@ -34,6 +32,14 @@ use starknet::{ContractAddress, get_caller_address};
         allowance: LegacyMap::<(ContractAddress, ContractAddress), u128>,
     }
 
+    #[constructor]
+    fn constructor(ref self: ContractState) {
+        self.name.write('BuyToken');
+        self.symbol.write('BTK');
+        self.decimal.write(18);
+        self.owner.write(get_caller_address());
+    }
+
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event{
@@ -41,7 +47,6 @@ use starknet::{ContractAddress, get_caller_address};
         Transfer: Transfer,
         Mint: Mint,
         Withdraw: Withdraw,
-        WithdrawEth: WithdrawEth,
         Approval: Approval,
     }
 
@@ -65,19 +70,13 @@ use starknet::{ContractAddress, get_caller_address};
         #[key]
         to: ContractAddress,
         amount: u128
+
     }
 
      #[derive(Drop, starknet::Event)]
     struct Withdraw {
         #[key]
         contract_address: ContractAddress,
-        user: ContractAddress,
-        amount: u128
-    }
-
-     #[derive(Drop, starknet::Event)]
-    struct WithdrawEth {
-        #[key]
         user: ContractAddress,
         amount: u128
     }
@@ -93,28 +92,44 @@ use starknet::{ContractAddress, get_caller_address};
     #[external(v0)]
     impl ITokenImpl of token_stake::buy_token::IToken<ContractState>{
         fn mint(ref self: ContractState, address: ContractAddress ) {
-
+            let caller: ContractAddress = get_caller_address();
+            assert(!caller.is_zero(), 'Caller cannot be address zero');
+            let supply: u128 = self.total_supply.read();
+            let balance: u128 = self.balance_of.read(get_caller_address());
+            self.total_supply.write(supply + 1000);
+            self.balance_of.write(get_caller_address(), balance + 1000);
+            self.emit(Mint {to: get_caller_address(), amount: 1000});
         }
         fn transfer(ref self: ContractState, address: ContractAddress, amount: u128 ) {
-
+            let sender_balance: u128 = self.balance_of.read(get_caller_address());
+            let reciever_balance: u128 = self.balance_of.read(address);
+            assert(sender_balance >= amount, 'Not Enough Tokens');
+            self.balance_of.write(get_caller_address(), sender_balance - amount);
+            self.balance_of.write(address, reciever_balance + amount);
+            self.emit(Transfer {to: address, amount: amount});
         }
         fn approval(ref self: ContractState, from: ContractAddress, to: ContractAddress, amount: u128 ) {
-
+            self.allowance.write((from,to), self.allowance.read((from, to)) + amount);
+            self.emit(Approval {user: from, to: to, amount: amount});
         }
         fn allowance(self: @ContractState, from: ContractAddress, to: ContractAddress ) -> u128 {
             self.allowance.read((from, to))
         }
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, amount: u128 ) {
-
+            assert(self.allowance.read((from, to)) >= amount, 'Insufficient Allowance');
+            self.allowance.write((from, to), self.allowance.read((from, to)) - amount);
+            assert(self.balance_of.read(from) >= amount, 'Not Enough Tokens');
+            self.balance_of.write(from, self.balance_of.read(from) - amount);
+            self.balance_of.write(to, self.balance_of.read(to) + amount);
+            self.emit(TransferFrom {from: from, to: to, amount: amount});
         }
         fn withdrawTokens(ref self: ContractState, contract_address: ContractAddress, amount: u128) {
-
-        }
-        fn withdrawAllTokens(ref self: ContractState, contract_address: ContractAddress) {
-
-        }
-        fn withdrawEth(ref self: ContractState) {
-
+            let contract_balance = self.balance_of.read(get_contract_address());
+            let caller_balance = self.balance_of.read(get_caller_address());
+            assert(contract_balance >= amount, 'Contract balance Insufficient');
+            self.balance_of.write(get_caller_address(), caller_balance + amount );
+            self.balance_of.write(get_contract_address(), contract_balance - amount );
+            self.emit(Withdraw {contract_address: contract_address, user: get_caller_address(), amount});
         }
         fn get_name(self: @ContractState) -> felt252 {
             self.name.read()
