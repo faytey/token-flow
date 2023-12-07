@@ -23,7 +23,7 @@ trait INFT<TContractState> {
 }
 
 #[starknet::contract]
-mod ERC721 {
+mod NFTEE {
     use starknet::get_caller_address;
     use starknet::contract_address_const;
     use starknet::ContractAddress;
