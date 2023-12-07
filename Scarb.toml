@@ -1,13 +1,15 @@
 [package]
-name = "token_stake"
+name = "token_flow"
 version = "0.1.0"
 
 # See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
 
 [dependencies]
 # foo = { path = "vendor/foo" }
-starknet = ">=2.2.0"
+starknet = ">=2.1.0"
 snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.7.1" }
+pragma_lib = { git = "https://github.com/astraly-labs/pragma-lib" }
+ekubo = { git = "https://github.com/ekuboprotocol/abis" }
 
 [[target.starknet-contract]]
 sierra = true
