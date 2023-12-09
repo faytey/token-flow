@@ -12,9 +12,15 @@ version = "1.0.0"
 source = "git+https://github.com/astraly-labs/pragma-lib#24bb4da111ae7eb00e7cf40d4f1767c86d6447cd"
 
 [[package]]
+name = "snforge_std"
+version = "0.1.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry.git?tag=v0.10.1#2f1597fb724b7df3050468bd0e6a8a3a0e225001"
+
+[[package]]
 name = "token_flow"
 version = "0.1.0"
 dependencies = [
  "ekubo",
  "pragma_lib",
+ "snforge_std",
 ]

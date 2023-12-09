@@ -7,6 +7,7 @@ version = "0.1.0"
 [dependencies]
 # foo = { path = "vendor/foo" }
 starknet = ">=2.3.1"
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry.git", tag = "v0.10.1" }
 pragma_lib = { git = "https://github.com/astraly-labs/pragma-lib" }
 ekubo = { git = "https://github.com/ekuboprotocol/abis" }
 
