@@ -5,6 +5,8 @@ trait ICredit<TContractState> {
     fn lend(ref self: TContractState, contract: ContractAddress, amount: u128) -> bool;
     fn borrow(ref self: TContractState, contract: ContractAddress, amount: u128) -> bool;
     fn get_pool_balance(self: @TContractState) -> u128;
+    fn withdraw(ref self: TContractState, amount: u128) -> bool;
+    fn repay(ref self: TContractState, amount: u128) -> bool;
 }
 
 #[starknet::contract]
@@ -65,6 +67,26 @@ mod Credit {
         
         fn get_pool_balance(self: @ContractState) -> u128 {
             self.contract_balance.read()
+        }
+
+        fn withdraw(ref self: ContractState, amount: u128) -> bool {
+            let con_address = ITokenDispatcher {contract_address: contract};
+            let user = get_caller_address();
+            let con = get_contract_address();
+            assert(self.lenders.read(user) >= amount, 'No balance');
+            self.lenders.write(user, self.lenders.read(user) - amount);
+            con_address.get_balance_of_user(user) + amount;
+            self.emit(user: user, amount: amount, success: true);
+        }
+
+        fn repay(ref self: ContractState, amount: u128) -> bool {
+            let con_address = ITokenDispatcher {contract_address: contract};
+            let user = get_caller_address();
+            let con = get_contract_address();
+            assert(self.borrowers.read(user) >= amount, 'No loan');
+            con_address.transfer_from(user, con, amount);
+            self.borrowers.write(user, self.borrowers.read(user) - amount);
+            self.emit(user: user, amount: amount, success: true);
         }
 
     }
