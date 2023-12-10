@@ -18,7 +18,7 @@ trait IToken<TContractState> {
 
 #[starknet::contract]
 
-mod InitToken {
+mod LendingToken {
 use starknet::{ContractAddress, get_caller_address, get_contract_address};
 
     #[storage]

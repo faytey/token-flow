@@ -1,0 +1,135 @@
+[
+  {
+    "type": "impl",
+    "name": "IFeedImpl",
+    "interface_name": "token_flow::price_feed::IFeed"
+  },
+  {
+    "type": "enum",
+    "name": "pragma_lib::types::DataType",
+    "variants": [
+      {
+        "name": "SpotEntry",
+        "type": "core::felt252"
+      },
+      {
+        "name": "FutureEntry",
+        "type": "(core::felt252, core::integer::u64)"
+      },
+      {
+        "name": "GenericEntry",
+        "type": "core::felt252"
+      }
+    ]
+  },
+  {
+    "type": "interface",
+    "name": "token_flow::price_feed::IFeed",
+    "items": [
+      {
+        "type": "function",
+        "name": "get_asset_price_median",
+        "inputs": [
+          {
+            "name": "asset",
+            "type": "pragma_lib::types::DataType"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_btc_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_eth_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_doge_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_avax_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_wbtc_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_wsteth_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_sol_to_usd_median",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u128"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "token_flow::price_feed::PriceFeed::Event",
+    "kind": "enum",
+    "variants": []
+  }
+]
